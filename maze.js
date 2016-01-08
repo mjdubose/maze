@@ -29,7 +29,7 @@ function clicked() {
     SetupCellNeighbors(cells, _size);
 
     var random = getRandomInt(0, _size);
-    console.log(random);
+   
     builderList.push(cells[random]);
 
     while (builderList.length > 0) {
@@ -43,6 +43,7 @@ function clicked() {
 
     function Cell(gridlocation) {
         this.GridLocation = gridlocation;
+        //noinspection JSUnusedGlobalSymbols
         this.Visited = false;
         this.Top = null;
         this.Bottom = null;
@@ -53,8 +54,7 @@ function clicked() {
     }
 
     function getRandomInt(min, max) {
-        var r = Math.floor(Math.random() * (max - min)) + min;
-        return r;
+        return  Math.floor(Math.random() * (max - min)) + min;
 
     }
 
@@ -219,6 +219,5 @@ function clicked() {
         for (var j = 0; j < _size + 1; j++) {
             grid[j] = false;
         }
-
     }
 }
