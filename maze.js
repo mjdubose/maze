@@ -10,12 +10,11 @@ function clicked() {
     if (parseInt(_size) > 840) {
         return;
     }
-    var _size = parseInt(_size);
+    _size = parseInt(_size);
     var _grid = new Array(_size * _size);
     var builderList = [];
     var cells = [];
     var random = getRandomInt(0, _size);
-    InitializeWalls(_grid);
     RenderWalls(_grid, _size);
     InitializeCells(cells, _size);
     SetupCellNeighbors(cells, _size);
@@ -113,25 +112,6 @@ function RenderWalls(grid, size) {
             }
         }
     }
-}
-
-function each(collection, callback) {
-    if (Array.isArray(collection)) {
-        for (var i = 0; i < collection.length; i++) {
-            callback(collection[i]);
-        }
-    }
-    else {
-        for (var prop in collection) {
-            callback(collection[prop]);
-        }
-    }
-}
-
-function InitializeWalls(grid) {
-    each(grid, function (element) {
-        element = false;
-    });
 }
 
 function Point(x, y) {
