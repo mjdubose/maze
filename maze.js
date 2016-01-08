@@ -29,7 +29,7 @@ function clicked() {
     SetupCellNeighbors(cells, _size);
 
     var random = getRandomInt(0, _size);
-   
+
     builderList.push(cells[random]);
 
     while (builderList.length > 0) {
