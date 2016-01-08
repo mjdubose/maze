@@ -2,11 +2,11 @@
  * Created by Matthew on 11/30/2015.
  */
 
-var _size;
-var _grid;
-
-
 function clicked() {
+
+    var _size;
+    var _grid;
+
 
     _size = document.getElementById('size').value;
     if (_size == "") {
@@ -74,9 +74,7 @@ function clicked() {
 
         }
         if (!mazeCell.Left.Visited) {
-
             goingtopossibleList.push(mazeCell.Left);
-
         }
 
         return goingtopossibleList;
@@ -90,7 +88,6 @@ function clicked() {
     }
 
     function Removewall(mazeCell, whichway, grid) {
-
 
         if (mazeCell.GridLocation.X < whichway.GridLocation.X) {
             grid[((mazeCell.GridLocation.X + 1) * _size) + mazeCell.GridLocation.Y] = true;
@@ -196,19 +193,15 @@ function clicked() {
 
                 if (workingOnThisOne.Top == null) {
                     workingOnThisOne.Top = cells[(i - 1) * width + j];
-
                 }
                 if (workingOnThisOne.Bottom == null) {
                     workingOnThisOne.Bottom = cells[(i + 1) * width + j];
-
                 }
                 if (workingOnThisOne.Left == null) {
                     workingOnThisOne.Left = cells[linewidth + (j - 1)];
-
                 }
                 if (workingOnThisOne.Right == null) {
                     workingOnThisOne.Right = cells[linewidth + (j + 1)];
-
                 }
             }
         }
