@@ -66,7 +66,7 @@ function clicked() {
     function RemoveCurrentPosition(mazeCell, grid) {
         var x = mazeCell.GridLocation;
         grid[x.X * _size + x.Y] = true;
-        Draw(mazeCell.GridLocation.X, mazeCell.GridLocation.Y);
+        Draw(x.X, x.Y);
     }
 }
 
@@ -120,13 +120,14 @@ function Point(x, y) {
 }
 
 function Cell(gridlocation) {
-    this.GridLocation = gridlocation;
-    //noinspection JSUnusedGlobalSymbols
-    this.Visited = false;
-    this.Top = null;
-    this.Bottom = null;
-    this.Left = null;
-    this.Right = null;
+ return {
+    GridLocation: gridlocation,
+    Visited: false,
+    Top: null,
+    Bottom: null,
+    Left: null,
+    Right: null
+};
 }
 
 function getRandomInt(min, max) {
