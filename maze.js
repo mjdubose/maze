@@ -86,10 +86,8 @@ var removeWall = function (mazeCell, direction, grid) {
 var getDirectionList = function (mazeCell) {
     var directionList = [];
     for (var prop in mazeCell) {
-        if (!(prop === 'GridLocation' || prop === 'Visited')) {
-            if (!mazeCell[prop].Visited) {
-                directionList.push(mazeCell[prop]);
-            }
+        if (!(prop === 'GridLocation' || prop === 'Visited') && !mazeCell[prop].Visited) {
+            directionList.push(mazeCell[prop]);
         }
     }
     return directionList;
