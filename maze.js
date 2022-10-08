@@ -28,11 +28,9 @@ const initializeCells = (cells, size) => {
     }
 };
 
-const removeCurrentPositionOnCanvas = (mazeCell, grid) => {
-    //get current grid item, figure out where it's drawn
+const removeCurrentPosition = (mazeCell, grid) => {
     const x = mazeCell.GridLocation;
     grid[x.X * _size + x.Y] = true;
-    //change the pixel colors;
     Draw(x.X, x.Y);
 };
 
@@ -42,7 +40,7 @@ const buildMaze = (mazeCell, grid) => {
 
     // if we haven't been here before, remove the color on the map, set the value to visited
     if (!mazeCell[mazeCell.length - 1].Visited) {
-        removeCurrentPositionOnCanvas(mazeCell[mazeCell.length - 1], grid);
+        removeCurrentPosition(mazeCell[mazeCell.length - 1], grid);
         mazeCell[mazeCell.length - 1].Visited = true;
     }
 
@@ -58,7 +56,11 @@ const buildMaze = (mazeCell, grid) => {
 
 const clicked = () => {
     _size = document.getElementById('size').value;
-    if (_size === "" || _size * 1 > 840) {
+    if (_size === "" || _size *1 > 840) {
+        return;
+    }
+    _size = parseInt(_size);
+    if (_size > 840) {
         return;
     }
 
@@ -70,7 +72,7 @@ const clicked = () => {
     setupCellNeighbors(cells, _size);
     const builderList = [cells[random]];
     while (builderList.length > 0) {
-        buildMaze(builderList, _grid, getRandomInt(0, _size));
+       buildMaze(builderList, _grid);
     }
 };
 
