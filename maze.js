@@ -1,69 +1,80 @@
 /**
  * Created by Matthew on 11/30/2015.
  */
+let _size;
+const context = document.getElementById('drawingarea').getContext("2d");
 
-var _size;
-var context = document.getElementById('drawingarea').getContext("2d");
+const getRandomInt = (min, max) => {
+    return Math.floor(Math.random() * (max - min)) + min;
+};
 
-var clicked = function () {
-    _size = document.getElementById('size').value;
-    if (_size === "") {
-        return;
-    }
-    _size = parseInt(_size);
-    if (_size > 840) {
-        return;
-    }
-
-    var _grid = new Array(_size * _size);
-    var builderList = [];
-    var cells = [];
-    var random = getRandomInt(0, _size);
-    renderWalls(_grid, _size);
-    initializeCells(cells, _size);
-    setupCellNeighbors(cells, _size);
-    builderList.push(cells[random]);
-    while (builderList.length > 0) {
-        builderList = buildMaze(builderList, _grid, getRandomInt(0, _size));
+const renderWalls = (grid, size) => {
+    context.fillStyle = "#000";
+    const _size = size + 1;
+    for (let x = 0; x < _size; x++) {
+        for (let y = 0; y < _size; y++) {
+            if (!grid[x * _size + y]) {
+                context.fillRect(x, y, 1, 1);
+            }
+        }
     }
 };
 
-var moveInDirection = function (directionList, mazeCell, grid) {
-    var direction = getRandomInt(0, directionList.length);
-    removeWall(mazeCell[mazeCell.length - 1], directionList[direction], grid);
-    mazeCell.push(directionList[direction]);
-    return mazeCell;
-};
-
-var buildMaze = function (mazeCell, grid) {
-    var directionList = getDirectionList(mazeCell[mazeCell.length - 1]);
-    if (mazeCell[mazeCell.length - 1].Visited && directionList.length > 0) {
-        return moveInDirection(directionList, mazeCell, grid);
-    }
-    removeCurrentPosition(mazeCell[mazeCell.length - 1], grid);
-    mazeCell[mazeCell.length - 1].Visited = true;
-    if (0 < directionList.length) {
-        return moveInDirection(directionList, mazeCell, grid);
-    }
-    mazeCell.pop();
-    return mazeCell;
-};
-
-var removeCurrentPosition = function (mazeCell, grid) {
-    var x = mazeCell.GridLocation;
-    grid[x.X * _size + x.Y] = true;
-    Draw(x.X, x.Y);
-};
-
-var initializeCells = function (cells, size) {
-    for (var j = 0; j <= (size / 2) - 1; j++) {
-        for (var i = 0; i <= (size / 2) - 1; i++) {
+const initializeCells = (cells, size) => {
+    for (let j = 0; j <= (size / 2) - 1; j++) {
+        for (let i = 0; i <= (size / 2) - 1; i++) {
             cells.push(new Cell(new Point(i * 2 + 1, j * 2 + 1)));
         }
     }
 };
 
-var removeWall = function (mazeCell, direction, grid) {
+const removeCurrentPositionOnCanvas = (mazeCell, grid) => {
+    //get current grid item, figure out where it's drawn
+    const x = mazeCell.GridLocation;
+    grid[x.X * _size + x.Y] = true;
+    //change the pixel colors;
+    Draw(x.X, x.Y);
+};
+
+const buildMaze = (mazeCell, grid) => {
+    //get a list of unvisited directions (Top, Bottom, Left,Right)
+    const directionList = getDirectionList(mazeCell[mazeCell.length - 1]);
+
+    // if we haven't been here before, remove the color on the map, set the value to visited
+    if (!mazeCell[mazeCell.length - 1].Visited) {
+        removeCurrentPositionOnCanvas(mazeCell[mazeCell.length - 1], grid);
+        mazeCell[mazeCell.length - 1].Visited = true;
+    }
+
+    // and move to the direction to which we haven't visited
+    if (0 < directionList.length) {
+        moveInDirection(directionList, mazeCell, grid);
+        return;
+    }
+    // we've been everywhere, remove this array from the list of places to visit
+    mazeCell.pop();
+
+};
+
+const clicked = () => {
+    _size = document.getElementById('size').value;
+    if (_size === "" || _size * 1 > 840) {
+        return;
+    }
+
+    const _grid = new Array(_size * _size);
+    const cells = [];
+    const random = getRandomInt(0, _size);
+    renderWalls(_grid, _size);
+    initializeCells(cells, _size);
+    setupCellNeighbors(cells, _size);
+    const builderList = [cells[random]];
+    while (builderList.length > 0) {
+        buildMaze(builderList, _grid, getRandomInt(0, _size));
+    }
+};
+
+const removeWall = (mazeCell, direction, grid) => {
     if (mazeCell.GridLocation.X < direction.GridLocation.X) {
         grid[((mazeCell.GridLocation.X + 1) * _size) + mazeCell.GridLocation.Y] = true;
         Draw(mazeCell.GridLocation.X + 1, mazeCell.GridLocation.Y);
@@ -83,41 +94,29 @@ var removeWall = function (mazeCell, direction, grid) {
     Draw(mazeCell.GridLocation.X, mazeCell.GridLocation.Y - 1);
 };
 
-var getDirectionList = function (mazeCell) {
-    var directionList = [];
-    for (var prop in mazeCell) {
-        if (!(prop === 'GridLocation' || prop === 'Visited')) {
-            if (!mazeCell[prop].Visited) {
-                directionList.push(mazeCell[prop]);
-            }
-        }
-    }
-    return directionList;
+const moveInDirection = (directionList, mazeCell, grid) => {
+    const direction = getRandomInt(0, directionList.length);
+    removeWall(mazeCell[mazeCell.length - 1], directionList[direction], grid);
+    mazeCell.push(directionList[direction]);
 };
 
-var Draw = function (x, y) {
+const getDirectionList = (mazeCell) => {
+    return Object.keys(mazeCell).reduce((acc, item) => {
+        if (!(item === 'GridLocation' || item === 'Visited')) {
+            if (!mazeCell[item].Visited) {
+                acc.push(mazeCell[item]);
+            }
+        }
+        return acc;
+    }, [])
+};
+
+const Draw = (x, y) => {
     context.fillStyle = "#FFF";
     context.fillRect(x, y, 1, 1);
 };
 
-var renderWalls = function (grid, size) {
-    context.fillStyle = "#000";
-    var _size = size + 1;
-    for (var x = 0; x < _size; x++) {
-        for (var y = 0; y < _size; y++) {
-            if (!grid[x * _size + y]) {
-                context.fillRect(x, y, 1, 1);
-            }
-        }
-    }
-};
-
-var Point = function (x, y) {
-    this.X = x;
-    this.Y = y;
-};
-
-var Cell = function (gridLocation) {
+const Cell = function (gridLocation) {
     return {
         GridLocation: gridLocation,
         Visited: false,
@@ -127,19 +126,20 @@ var Cell = function (gridLocation) {
         Right: null
     };
 };
-
-var getRandomInt = function (min, max) {
-    return Math.floor(Math.random() * (max - min)) + min;
+const Point = function (x, y) {
+    this.X = x;
+    this.Y = y;
 };
 
-var setupCellNeighbors = function (cells, size) {
-    var width = size / 2;
-    var lineWidth;
-    var targetCell;
-    for (var j = 0; j <= width - 1; j++) {
-        for (var i = 0; i <= width - 1; i++) {
-         lineWidth = i * width;
-         targetCell = cells[lineWidth + j];
+
+const setupCellNeighbors = (cells, size) => {
+    const width = size / 2;
+    let lineWidth;
+    let targetCell;
+    for (let j = 0; j <= width - 1; j++) {
+        for (let i = 0; i <= width - 1; i++) {
+            lineWidth = i * width;
+            targetCell = cells[lineWidth + j];
             if (i === 0) {
                 targetCell.Top = cells[lineWidth + j];
             }
