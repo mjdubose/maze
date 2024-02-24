@@ -46,38 +46,39 @@ const clicked = () => {
 
     const setupCellNeighbors = (size) => {
         return (cells) => {
-            const width = size / 2;
+            const halfSize = size / 2;
 
-            for (let j = 0; j <= width - 1; j++) {
-                for (let i = 0; i <= width - 1; i++) {
-                    const lineWidth = i * width;
-                    const targetCell = cells[lineWidth + j];
+            const assignNeighbor = (currentCell, direction, value) => {
+                if (currentCell[direction] == null) {
+                    currentCell[direction] = value;
+                }
+            };
+
+            for (let j = 0; j < halfSize; j++) {
+                for (let i = 0; i < halfSize; i++) {
+                    const cellIndexMultiplier = i * halfSize;
+                    const currentCell = cells[cellIndexMultiplier + j];
+
                     if (i === 0) {
-                        targetCell.Top = cells[lineWidth + j];
+                        currentCell.Top = cells[cellIndexMultiplier + j];
                     }
                     if (j === 0) {
-                        targetCell.Left = cells[lineWidth + j];
+                        currentCell.Left = cells[cellIndexMultiplier + j];
                     }
-                    if (i === width - 1) {
-                        targetCell.Bottom = cells[lineWidth + j];
+                    if (i === halfSize - 1) {
+                        currentCell.Bottom = cells[cellIndexMultiplier + j];
                     }
-                    if (j === width - 1) {
-                        targetCell.Right = cells[lineWidth + j];
+                    if (j === halfSize - 1) {
+                        currentCell.Right = cells[cellIndexMultiplier + j];
                     }
-                    if (targetCell.Top == null) {
-                        targetCell.Top = cells[(i - 1) * width + j];
-                    }
-                    if (targetCell.Bottom == null) {
-                        targetCell.Bottom = cells[(i + 1) * width + j];
-                    }
-                    if (targetCell.Left == null) {
-                        targetCell.Left = cells[lineWidth + (j - 1)];
-                    }
-                    if (targetCell.Right == null) {
-                        targetCell.Right = cells[lineWidth + (j + 1)];
-                    }
+
+                    assignNeighbor(currentCell, 'Top', cells[(i - 1) * halfSize + j]);
+                    assignNeighbor(currentCell, 'Bottom', cells[(i + 1) * halfSize + j]);
+                    assignNeighbor(currentCell, 'Left', cells[cellIndexMultiplier + (j - 1)]);
+                    assignNeighbor(currentCell, 'Right', cells[cellIndexMultiplier + (j + 1)]);
                 }
             }
+
             return cells;
         }
     };
