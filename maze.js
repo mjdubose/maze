@@ -31,16 +31,21 @@ const clicked = () => {
 
 
     const renderWalls = (size) => {
+        const WALL_SIZE = 1;
         const grid = new Array(size * size);
         context.fillStyle = "#000";
-        const _size = size + 1;
-        for (let x = 0; x < _size; x++) {
-            for (let y = 0; y < _size; y++) {
-                if (!grid[x * _size + y]) {
-                    context.fillRect(x, y, 1, 1);
+        const gridSize = size + 1;
+
+        const isEmptyCell = (index) => !grid[index];
+
+        for (let x = 0; x < gridSize; x++) {
+            for (let y = 0; y < gridSize; y++) {
+                if (isEmptyCell(x * gridSize + y)) {
+                    context.fillRect(x, y, WALL_SIZE, WALL_SIZE);
                 }
             }
         }
+
         return grid;
     };
 
@@ -138,14 +143,17 @@ const clicked = () => {
         Draw(x.X, x.Y);
     };
 
-    const initializeCells = (size) => {
+    const generateCells = (size) => {
         const cells = [];
-        const halved = size / 2;
-        for (let j = 0; j <= (halved) - 1; j++) {
-            for (let i = 0; i <= (halved) - 1; i++) {
+        const halfSize = size / 2;
+        const limit = halfSize - 1;
+
+        for (let j = 0; j <= limit; j++) {
+            for (let i = 0; i <= limit; i++) {
                 cells.push(new Cell(new Point(i * 2 + 1, j * 2 + 1)));
             }
         }
+
         return cells;
     };
 
@@ -153,32 +161,38 @@ const clicked = () => {
         return Math.floor(Math.random() * (max - min)) + min;
     };
 
-    const buildMazeWithGrid = (grid) => {
-        return (mazeCell) => {
-            //get a list of unvisited directions (Top, Bottom, Left,Right)
-            const directionList = getDirectionList(mazeCell[mazeCell.length - 1]);
+    // Function to handle the unvisited maze cell
+    const handleUnvisitedCell = (mazeCell, grid) => {
+        if (!mazeCell.Visited) {
+            removeCurrentPosition(mazeCell, grid);
+            mazeCell.Visited = true;
+        }
+    };
 
-            // if we haven't been here before, remove the color on the map, set the value to visited
-            if (!mazeCell[mazeCell.length - 1].Visited) {
-                removeCurrentPosition(mazeCell[mazeCell.length - 1], grid);
-                mazeCell[mazeCell.length - 1].Visited = true;
-            }
-
-            // and move to the direction to which we haven't visited
-            if (0 < directionList.length) {
-                moveInDirection(directionList, mazeCell, grid);
-                return;
-            }
-            // we've been everywhere, remove this array from the list of places to visit
+//Function to move to an unvisited direction
+    const moveToUnvisitedDirection = (directionList, mazeCell, grid) => {
+        if (directionList.length > 0) {
+            moveInDirection(directionList, mazeCell, grid);
+        } else {
+            //we've been everywhere, remove this array from the list of places to visit
             mazeCell.pop();
         }
+    };
 
+    const buildMazeWithGrid = (grid) => {
+        return (mazeCell) => {
+            const latestMazeCell = mazeCell[mazeCell.length - 1];
+            const directionList = getDirectionList(latestMazeCell);
+
+            handleUnvisitedCell(latestMazeCell, grid);
+            moveToUnvisitedDirection(directionList, mazeCell, grid);
+        }
     };
 
 
     const buildMaze = compose(buildMazeWithGrid, renderWalls)(_size);
 
-    const cells = compose(setUpCellNeighborsCells, initializeCells)(_size);
+    const cells = compose(setUpCellNeighborsCells, generateCells)(_size);
     const builderList = [cells[getRandomInt(0, _size)]];
     while (builderList.length > 0) {
         buildMaze(builderList);
