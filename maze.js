@@ -111,23 +111,25 @@ const clicked = () => {
             modifyGrid(grid, X, Y - 1);
         }
     };
-    const moveInDirection = (directionList, mazeCell, grid) => {
-        //out of the list of directions
-        const direction = getRandomInt(0, directionList.length);
-        //pick one and remove the wall in that direction
-        removeWall(mazeCell[mazeCell.length - 1], directionList[direction], grid);
-        //on next iteration this is the spot we're starting from;
-        mazeCell.push(directionList[direction]);
-    };
-    const getDirectionList = (mazeCell) => {
-        return Object.keys(mazeCell).reduce((acc, item) => {
-            if (!(item === 'GridLocation' || item === 'Visited')) {
+    const moveInDirection = (possibleDirections, mazeCell, grid) => {
+        const selectedDirectionIndex = getRandomInt(0, possibleDirections.length);
+        const nextMazeCell = possibleDirections[selectedDirectionIndex];
 
-                // for each of the directions, if we haven't been that way yet
-                if (!mazeCell[item].Visited) {
-                    // add that direction;
-                    acc.push(mazeCell[item]);
-                }
+        removeWall(mazeCell[mazeCell.length - 1], nextMazeCell, grid);
+
+        // Add selected direction to the maze cell for subsequent movement.
+        mazeCell.push(nextMazeCell);
+    };
+    const FILTER_KEYS = ['GridLocation', 'Visited'];
+
+    const isUnvisitedDirection = (mazeCell, key) => {
+        return !FILTER_KEYS.includes(key) && !mazeCell[key].Visited;
+    };
+
+    const getDirectionList = (mazeCell) => {
+        return Object.keys(mazeCell).reduce((acc, key) => {
+            if (isUnvisitedDirection(mazeCell, key)) {
+                acc.push(mazeCell[key]);
             }
             return acc;
         }, []);
@@ -143,21 +145,21 @@ const clicked = () => {
         Draw(x.X, x.Y);
     };
 
+    const getCoords = (i, j) => new Point(i * 2 + 1, j * 2 + 1);
+
     const generateCells = (size) => {
         const cells = [];
-        const halfSize = size / 2;
-        const limit = halfSize - 1;
-
-        for (let j = 0; j <= limit; j++) {
-            for (let i = 0; i <= limit; i++) {
-                cells.push(new Cell(new Point(i * 2 + 1, j * 2 + 1)));
+        const gridBound = size / 2 - 1;
+        for (let j = 0; j <= gridBound; j++) {
+            for (let i = 0; i <= gridBound; i++) {
+                const coordinates = getCoords(i, j);
+                cells.push(new Cell(coordinates));
             }
         }
-
         return cells;
     };
 
-    const getRandomInt = (min, max) => {
+    const getRandomInt = (min, max) => {512
         return Math.floor(Math.random() * (max - min)) + min;
     };
 
