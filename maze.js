@@ -84,24 +84,26 @@ const clicked = () => {
 
     const setUpCellNeighborsCells = setupCellNeighbors(_size);
 
+    const modifyGrid = (grid, x, y) => {
+        grid[x * _size + y] = true;
+        Draw(x, y);
+    };
+
     const removeWall = (mazeCell, direction, grid) => {
-        if (mazeCell.GridLocation.X < direction.GridLocation.X) {
-            grid[((mazeCell.GridLocation.X + 1) * _size) + mazeCell.GridLocation.Y] = true;
-            Draw(mazeCell.GridLocation.X + 1, mazeCell.GridLocation.Y);
+        const {X, Y} = mazeCell.GridLocation;
+        const {GridLocation} = direction;
+
+        if (X < GridLocation.X) {
+            modifyGrid(grid, X + 1, Y);
+        } else if (X > GridLocation.X) {
+            modifyGrid(grid, X - 1, Y);
         }
-        if (mazeCell.GridLocation.X > direction.GridLocation.X) {
-            grid[((mazeCell.GridLocation.X - 1) * _size) + mazeCell.GridLocation.Y] = true;
-            Draw(mazeCell.GridLocation.X - 1, mazeCell.GridLocation.Y);
+
+        if (Y < GridLocation.Y) {
+            modifyGrid(grid, X, Y + 1);
+        } else if (Y > GridLocation.Y) {
+            modifyGrid(grid, X, Y - 1);
         }
-        if (mazeCell.GridLocation.Y < direction.GridLocation.Y) {
-            grid[(mazeCell.GridLocation.X * _size) + mazeCell.GridLocation.Y + 1] = true;
-            Draw(mazeCell.GridLocation.X, mazeCell.GridLocation.Y + 1);
-        }
-        if (mazeCell.GridLocation.Y <= direction.GridLocation.Y) {
-            return;
-        }
-        grid[(mazeCell.GridLocation.X * _size) + mazeCell.GridLocation.Y - 1] = true;
-        Draw(mazeCell.GridLocation.X, mazeCell.GridLocation.Y - 1);
     };
     const moveInDirection = (directionList, mazeCell, grid) => {
         //out of the list of directions
