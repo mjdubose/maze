@@ -159,7 +159,7 @@ const clicked = () => {
         return cells;
     };
 
-    const getRandomInt = (min, max) => {512
+    const getRandomInt = (min, max) => {
         return Math.floor(Math.random() * (max - min)) + min;
     };
 
