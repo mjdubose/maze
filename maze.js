@@ -173,12 +173,7 @@ const clicked = () => {
 
 //Function to move to an unvisited direction
     const moveToUnvisitedDirection = (directionList, mazeCell, grid) => {
-        if (directionList.length > 0) {
-            moveInDirection(directionList, mazeCell, grid);
-        } else {
-            //we've been everywhere, remove this array from the list of places to visit
-            mazeCell.pop();
-        }
+       directionList.length > 0  ? moveInDirection(directionList, mazeCell, grid) : mazeCell.pop();
     };
 
     const buildMazeWithGrid = (grid) => {
